@@ -2938,7 +2938,7 @@ about its business.
 
       The :py:class:`~botogram.User` who sent the query.
 
-   .. py:attribute:: invoice_payload
+   .. py:attribute:: payload
 
       Bot specified invoice payload.
 
@@ -2986,7 +2986,7 @@ about its business.
 
       Total price in the *smallest* units of the currency (integer, not float/double).
 
-   .. py:attribute:: invoice_payload
+   .. py:attribute:: payload
 
       Bot specified invoice payload.
 

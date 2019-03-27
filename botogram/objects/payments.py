@@ -79,6 +79,7 @@ class ShippingQuery(BaseObject, ShippingQueryMixin):
     }
     replace_keys = {
         "from": "sender",
+        "invoice_payload": "payload",
     }
 
     def __init__(self, data, api=None):
@@ -99,6 +100,7 @@ class PreCheckoutQuery(BaseObject, PreCheckoutQueryMixin):
     }
     replace_keys = {
         "from": "sender",
+        "invoice_payload": "payload",
     }
 
     def __init__(self, data, api=None):

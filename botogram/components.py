@@ -203,20 +203,24 @@ class Component:
         hook = hooks.EditedChannelPostHook(func, self)
         self.__channel_post_edited_hooks.append(hook)
 
-    def add_shipping_query_hook(self, func):
+    def add_shipping_query_hook(self, func, payload):
         """Add a shipping query hook"""
         if not callable(func):
             raise ValueError("A shipping query hook must be callable")
 
-        hook = hooks.ShippingQueryHook(func, self)
+        hook = hooks.ShippingQueryHook(func, self, {
+            "payload": payload,
+        })
         self.__shipping_query_hooks.append(hook)
 
-    def add_pre_checkout_query_hook(self, func):
+    def add_pre_checkout_query_hook(self, func, payload):
         """Add a pre checkout query hook"""
         if not callable(func):
             raise ValueError("A pre checkout query hook must be callable")
 
-        hook = hooks.PreCheckoutQueryHook(func, self)
+        hook = hooks.PreCheckoutQueryHook(func, self, {
+            "payload": payload,
+        })
         self.__pre_checkout_query_hooks.append(hook)
 
     def _add_no_commands_hook(self, func):

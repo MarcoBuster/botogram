@@ -34,7 +34,7 @@ from .decorators import pass_bot, pass_shared, help_message_for
 from .runner import run
 from .objects import *
 from .utils import usernames_in
-from .payments import ShippingOptions, Prices
+from .payments import Invoice, ShippingOptions, Prices
 from .callbacks import Buttons, ButtonsRow
 
 

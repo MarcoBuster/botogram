@@ -187,15 +187,19 @@ class Bot(frozenbot.FrozenBot):
         self._main_component.add_channel_post_edited_hook(func)
         return func
 
-    def shipping_query(self, func):
+    def shipping_query(self, payload=None):
         """Add a shipping query hook"""
-        self._main_component.add_shipping_query_hook(func)
-        return func
+        def __(func):
+            self._main_component.add_shipping_query_hook(func, payload)
+            return func
+        return __
 
-    def pre_checkout(self, func):
+    def pre_checkout(self, payload=None):
         """Add a pre checkout query hook"""
-        self._main_component.add_pre_checkout_query_hook(func)
-        return func
+        def __(func):
+            self._main_component.add_pre_checkout_query_hook(func, payload)
+            return func
+        return __
 
     def command(self, name, hidden=False, order=0):
         """Register a new command"""

@@ -23,6 +23,7 @@ import json
 
 from .. import syntaxes
 from .. import utils
+from ..payments import SendInvoice
 from ..utils.deprecations import _deprecated_message
 from .base import multiple
 
@@ -344,45 +345,9 @@ class ChatMixin:
         return self._api.call("sendContact", args, expect=_objects().Message)
 
     @_require_api
-    def send_invoice(self,
-                     title,
-                     description,
-                     payload,
-                     start_parameter,
-                     provider_token,
-                     currency,
-                     prices,
-                     photo_url=None,
-                     photo_size=None,
-                     photo_width=None,
-                     photo_height=None,
-                     need_name=False,
-                     need_phone_number=False,
-                     need_email=False,
-                     need_shipping_address=False,
-                     is_flexible=False,
-                     notify=True):
-
-        self._api.call("sendInvoice", {
-            "chat_id": self.id,
-            "provider_token": provider_token,
-            "title": title,
-            "description": description,
-            "payload": payload,
-            "currency": currency,
-            "start_parameter": start_parameter,
-            "prices": prices._to_json(),
-            "photo_url": photo_url,
-            "photo_size": photo_size,
-            "photo_width": photo_width,
-            "photo_height": photo_height,
-            "need_name": need_name,
-            "need_phone_number": need_phone_number,
-            "need_email": need_email,
-            "need_shipping_address": need_shipping_address,
-            "is_flexible": is_flexible,
-            "disable_notification": not notify,
-        })
+    def send_invoice(self, reply_to=None, extra=None, attach=None, notify=True):
+        """Send an invoice"""
+        return SendInvoice(self, reply_to, extra, attach, notify)
 
     def delete_message(self, message):
         """Delete a message from chat"""
@@ -546,6 +511,10 @@ class MessageMixin:
         return self.chat.send_album(*args, reply_to=self, **kwargs)
 
     @_require_api
+    def reply_with_invoice(self, *args, **kwargs):
+        return self.chat.send_invoice(*args, reply_to=self, **kwargs)
+
+    @_require_api
     def delete(self):
         """Delete the message"""
         return self._api.call("deleteMessage", {
@@ -573,7 +542,7 @@ class ShippingQueryMixin:
 
     @_require_api
     def reply(self, shipping_options):
-        """Reply to shipping query"""
+        """Reply to a shipping query"""
         self._api.call("answerShippingQuery", {
             "shipping_query_id": self.id,
             "ok": True,
@@ -608,6 +577,7 @@ class PreCheckoutQueryMixin:
             "ok": False,
             "error_message": error_message
         })
+
 
 class Album:
     """Factory for albums"""

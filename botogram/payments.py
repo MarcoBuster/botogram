@@ -1,12 +1,26 @@
-"""
-    botogram.objects.payments
-    Logic to processing shipping and pre checkout queries sent to your bot
-
-    Copyright (c) 2017 Marco Aceti <dev@marcoaceti.it>
-    Released under the MIT license
-"""
+# Copyright (c) 2015-2019 The Botogram Authors (see AUTHORS)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+#   The above copyright notice and this permission notice shall be included in
+#   all copies or substantial portions of the Software.
+#
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+#   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#   DEALINGS IN THE SOFTWARE.
 
 import json
+
+from . import utils
 
 
 def process_shipping_query(bot, chains, update):
@@ -46,10 +60,10 @@ class Prices:
     Prices object
     """
     def __init__(self):
-        """Create a price object"""
         self._prices = []
 
     def add(self, label, amount):
+        """Add an item to prices"""
         self._prices.append({"label": label, "amount": amount})
 
     def _to_json(self):
@@ -61,16 +75,123 @@ class ShippingOptions:
     Shipping options object
     """
     def __init__(self):
-        """Create a shipping options object"""
         self._options = []
 
-    def add(self, title, prices):
-        """Add a options to options"""
-        telegram_prices = []
-        for price in prices:
-            telegram_prices.append({"label": price, "amount": prices[price]})
-
-        self._options.append({"title": title, "prices": telegram_prices})
+    def add(self, name, title, prices):
+        """Add a shipping options"""
+        self._options.append({"id": name,
+                              "title": title,
+                              "prices": prices._prices})
 
     def _to_json(self):
         return json.dumps(self._options)
+
+
+class Invoice:
+    """
+    Invoice object
+    TODO: Write documentation
+    """
+
+    def __init__(self):
+        self._items = []
+
+        self.provider_token = None
+        self.title = None
+        self.description = None
+        self.payload = None
+        self.start_parameter = None
+        self.currency = None
+
+        self.photo_url = None
+        self.photo_size = None
+        self.photo_width = None
+        self.photo_height = None
+
+        self.need_name = False
+        self.need_phone_number = False
+        self.need_email = False
+        self.need_shipping_address = False
+        self.is_flexible = False
+
+    def provider(self, provider_token):
+        self.provider_token = provider_token
+
+    def header(self, title, description, payload, start_parameter, currency):
+        self.title = title
+        self.description = description
+        self.payload = payload
+        self.start_parameter = start_parameter
+        self.currency = currency
+
+    def photo(self, url, size=None, width=None, height=None):
+        self.photo_url = url
+        self.photo_size = size
+        self.photo_width = width
+        self.photo_height = height
+
+    def request_for(self, name=False, phone_number=False, email=False):
+        self.need_name = name
+        self.need_phone_number = phone_number
+        self.need_email = email
+
+    def shipping(self, request_address, flexible):
+        self.need_shipping_address = request_address
+        self.is_flexible = flexible
+
+    def add_product(self, label, price):
+        self._items.append({"label": label, "amount": price})
+
+    @property
+    def total_amount(self):
+        return sum(item['amount'] for item in self._items)
+
+
+class SendInvoice(Invoice):
+    def __init__(self, chat, reply_to=None, extra=None, attach=None, notify=True):
+        super(SendInvoice, self).__init__()
+        self._get_call_args = chat._get_call_args
+        self._api = chat._api
+        self.reply_to = reply_to
+        self.extra = extra
+        self.attach = attach
+        self.notify = notify
+        self._used = False
+
+    def __enter__(self):
+        self._used = True
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            self.send()
+
+    def send(self):
+        args = self._get_call_args(self.reply_to, self.extra, self.attach, self.notify)
+        self._api.call("sendInvoice", {
+            **args,
+            "provider_token": self.provider_token,
+            "title": self.title,
+            "description": self.description,
+            "payload": self.payload,
+            "currency": self.currency,
+            "total_price": self.total_amount,
+            "start_parameter": self.start_parameter,
+            "prices": json.dumps(self._items),
+            "photo_url": self.photo_url,
+            "photo_size": self.photo_size,
+            "photo_width": self.photo_width,
+            "photo_height": self.photo_height,
+            "need_name": self.need_name,
+            "need_phone_number": self.need_phone_number,
+            "need_email": self.need_email,
+            "need_shipping_address": self.need_shipping_address,
+            "is_flexible": self.is_flexible,
+            "disable_notification": not args.get("notify", True),
+        })
+
+    def __del__(self):
+        if not self._used:
+            utils.warn(1, "error_with_invoice",
+                       "you should use `with` to use send_invoice\
+                        -- check the documentation")

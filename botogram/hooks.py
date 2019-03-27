@@ -275,8 +275,18 @@ class EditedChannelPostHook(Hook):
 class ShippingQueryHook(Hook):
     """Underlying hook for @bot.shipping_query"""
 
+    def _after_init(self, args):
+        self.payload = args["payload"]
+
     def _call(self, bot, update):
         shipping_query = update.shipping_query
+
+        if self.payload:
+            if shipping_query.payload == self.payload:
+                return bot._call(self.func, self.component_id,
+                                 query=shipping_query)
+            return
+
         return bot._call(self.func, self.component_id,
                          query=shipping_query)
 
@@ -284,8 +294,18 @@ class ShippingQueryHook(Hook):
 class PreCheckoutQueryHook(Hook):
     """Underlying hook for @bot.pre_checkout"""
 
+    def _after_init(self, args):
+        self.payload = args["payload"]
+
     def _call(self, bot, update):
         pre_checkout_query = update.pre_checkout_query
+
+        if self.payload:
+            if pre_checkout_query.payload == self.payload:
+                return bot._call(self.func, self.component_id,
+                                 query=pre_checkout_query)
+            return
+
         return bot._call(self.func, self.component_id,
                          query=pre_checkout_query)
 

@@ -1850,6 +1850,21 @@ about its business.
 
          It will be removed in botogram 1.0
 
+   .. py:attribute:: invoice
+
+      If the message contains an invoice, this attribute is an instance
+      of the :py:class:`~botogram.Invoice` class.
+
+      *This attribute can be None if it's not provided by Telegram*
+
+   .. py:attribute:: successful_payment
+
+      If the message contains a successful payment, this attribute is an instance
+      of the :py:class:`~botogram.SucessfulPayment` class.
+
+      *This attribute can be None if it's not provided by Telegram*
+
+
    .. py:method:: edit(text, [syntax=None, preview=True, attach=None, extra=None])
 
       With this method you can edit the text of a message the user already

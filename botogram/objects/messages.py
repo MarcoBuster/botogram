@@ -26,6 +26,7 @@ from .. import utils
 from .chats import User, Chat
 from .media import Audio, Voice, Document, Photo, Sticker, Video, VideoNote, \
     Contact, Location, Venue
+from .payments import Invoice, SuccessfulPayment
 
 
 _url_protocol_re = re.compile(r"^https?:\/\/|s?ftp:\/\/|mailto:", re.I)
@@ -360,6 +361,8 @@ class Message(BaseObject, mixins.MessageMixin):
         "migrate_from_chat_id": int,
         "pinned_message": _itself,
         "edit_date": int,
+        "invoice": Invoice,
+        "successful_payment": SuccessfulPayment,
     }
     replace_keys = {
         "from": "sender",

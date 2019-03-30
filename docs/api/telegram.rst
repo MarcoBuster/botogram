@@ -544,27 +544,11 @@ about its business.
 
       .. versionadded:: 0.3
 
-   .. py:method:: send_invoice(title, description, payload, start_parameter, provider_token, currency, prices, [photo_url=None, photo_size=None, photo_width=None, photo_height=None, need_name=False, need_phone_number=False, need_email=False, need_shipping_address=False, is_flexible=False, notify=True])
+   .. py:method:: send_invoice()
 
-      Send an invoice to the user.
+      Send an invoice to the user. TODO documentation.
 
-      :param str title: Product name
-      :param str description: Product description
-      :param str payload: Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes
-      :param str provider_token: Payments provider token, obtained via Botfather
-      :param str start_parameter: Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
-      :param str currency: Three-letter ISO 4217 currency code
-      :param array of objects prices: Price breakdown, a list of components
-      :param str photo_url: URL of the product photo for the invoice
-      :param int photo_size: Photo size
-      :param int photo_width: Photo width
-      :param int photo_height: Photo height
-      :param bool need_name: Pass True, if you require the user's full name to complete the order
-      :param bool need_phone_number: Pass True, if you require the user's phone number to complete the order
-      :param bool need_email: Pass True, if you require the user's email to complete the order
-      :param bool need_shipping_address: Pass True, if you require the user's shipping address to complete the order
-      :param bool is_flexible: Pass True, if the final price depends on the shipping method
-      :param bool notify: If you want to trigger a notification on the client
+      .. versionadded:: 0.7
 
    .. py:method:: send_album([album=None, reply_to=None, notify=True])
 
@@ -1391,29 +1375,11 @@ about its business.
 
       .. versionadded:: 0.3
 
-   .. py:method:: send_invoice(title, description, payload, start_parameter, provider_token, currency, prices, [photo_url=None, photo_size=None, photo_width=None, photo_height=None, need_name=False, need_phone_number=False, need_email=False, need_shipping_address=False, is_flexible=False, notify=True])
+   .. py:method:: send_invoice()
 
-      Send an invoice to the user.
+      Send an invoice to the user. TODO documentation.
 
-      :param str title: Product name
-      :param str description: Product description
-      :param str payload: Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes
-      :param str provider_token: Payments provider token, obtained via Botfather
-      :param str start_parameter: Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
-      :param str currency: Three-letter ISO 4217 currency code
-      :param array of objects prices: Price breakdown, a list of components
-      :param str photo_url: URL of the product photo for the invoice
-      :param int photo_size: Photo size
-      :param int photo_width: Photo width
-      :param int photo_height: Photo height
-      :param bool need_name: Pass True, if you require the user's full name to complete the order
-      :param bool need_phone_number: Pass True, if you require the user's phone number to complete the order
-      :param bool need_email: Pass True, if you require the user's email to complete the order
-      :param bool need_shipping_address: Pass True, if you require the user's shipping address to complete the order
-      :param bool is_flexible: Pass True, if the final price depends on the shipping method
-      :param bool notify: If you want to trigger a notification on the client
-
-      .. versionadded:: 0.4
+      .. versionadded:: 0.7
 
    .. py:method:: send_album([album=None, reply_to=None, notify=True])
 
@@ -1857,6 +1823,8 @@ about its business.
 
       *This attribute can be None if it's not provided by Telegram*
 
+      .. versionadded:: 0.7
+
    .. py:attribute:: successful_payment
 
       If the message contains a successful payment, this attribute is an instance
@@ -1864,6 +1832,7 @@ about its business.
 
       *This attribute can be None if it's not provided by Telegram*
 
+      .. versionadded:: 0.7
 
    .. py:method:: edit(text, [syntax=None, preview=True, attach=None, extra=None])
 
@@ -2980,10 +2949,12 @@ about its business.
 
       Decline the shipping address with an error message.
 
-   .. versionadded:: 0.4
+   .. versionadded:: 0.7
 
 
 .. py:class:: botogram.PreCheckoutQuery
+
+   This class contains information abount an incoming pre checkout query.
 
    .. py:attribute:: id
 
@@ -3017,7 +2988,6 @@ about its business.
 
       *This attribute can be None if it's not provided by Telegram.*
 
-
    .. py:method:: accept()
 
       Accept the pre checkout and continue the payment.
@@ -3026,7 +2996,152 @@ about its business.
 
       Decline the pre checkout and abort the payment with an error message.
 
-   .. versionadded:: 0.4
+   .. versionadded:: 0.7
+
+
+.. py:class:: botogram.Invoice
+
+   This class represents a Telegram Invoice.
+
+   .. py:attribute:: title
+
+      The invoice title.
+
+   .. py:attribute:: description
+
+      The invoice description.
+
+   .. py:attribute:: start_parameter
+
+      The invoice start parameter. If you share the invoice to another chat, the pay button will
+      change in button with a link to your bot with the start parameter specified in this attribute.
+
+   .. py:attribute:: currency
+
+      Three-letter ISO 4127 currency code. This field applies to all prices in this invoice.
+      Example: EUR or USD.
+
+   .. py:attribute:: total_amount
+
+      Total price in *smallest units* of the currency.
+
+   .. versionadded:: 0.7
+
+
+.. py:class:: botogram.LabeledPrice
+
+   This class represents a price with a label.
+
+   .. py:attribute:: label
+
+      Short label of the price.
+
+   .. py:attribute:: amount
+
+      Amount of the price, in *smallest units* of the currency.
+
+   .. versionadded:: 0.7
+
+
+.. py:class:: botogram.ShippingOption
+
+   This class represents a shipping option that an user can select during a payment.
+
+   .. py:attribute:: id
+
+      Identifier for the shipping option.
+
+   .. py:attribute:: title
+
+      Shipping option title.
+
+   .. py:attribute:: prices
+
+      Array of :py:class:`~botogram.LabeledPrice`.
+
+   .. versionadded:: 0.7
+
+
+.. py:class:: botogram.ShippingAddress
+
+   This class represents a shipping address submitted by an user who made a purchased throught the bot.
+
+   .. py:attribute:: country_code
+
+      ISO 3166-1 alpha-2 country code.
+
+   .. py:attribute:: state
+
+   .. py:attribute:: city
+
+   .. py:attribute:: street_line1
+
+      First line for the address
+
+   .. py:attribute:: street_line2
+
+      Second line for the address
+
+   .. py:attribute:: post_code
+
+      Address post code
+
+   .. versionadded:: 0.7
+
+
+.. py:class:: botogram.OrderInfo
+
+   This class represents an user who has made a purchase through the bot.
+
+   .. py:attribute:: name
+
+   .. py:attribute:: phone_number
+
+   .. py:attribute:: email
+
+   .. py:attribute:: shipping_address
+
+      Shipping address choosen by user. Instance of :py:class:`~botogram.OrderInfo`.
+
+   .. versionadded:: 0.7
+
+
+.. py:class:: botogram.SuccessfulPayment
+
+   This class represents a successful payment made by an user.
+
+   .. py:attribute:: currency
+
+      Three-letter ISO 4217 currency code.
+
+   .. py:attribute:: total_amount
+
+      Total price in *smallest units* of the currency.
+
+   .. py:attribute:: invoice_payload
+
+      Bot specified invoice payload.
+
+   .. py:attribute:: telegram_payment_charge_id
+
+      Telegram-side payment identifier.
+
+   .. py:attribute:: provider_payment_charge_id
+
+      Provider-side payment identifier.
+
+   .. py:attribute:: shipping_option_id
+
+      Identifier of the shipping option chosen by the user.
+
+      *This attribute can be None if it's not provided by Telegram.*
+
+   .. py:attribute:: order_info
+
+      Additionals information of the user. Instance of :py:class:`~botogram.OrderInfo`.
+
+   .. versionadded:: 0.7
+
 
 .. _Telegram's Bot API: https://core.telegram.org/bots/api
 .. _API methods: https://core.telegram.org/bots/api#available-methods

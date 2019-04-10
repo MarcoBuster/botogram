@@ -543,7 +543,7 @@ class ShippingQueryMixin:
     @_require_api
     def reply(self, shipping_options):
         """Reply to a shipping query"""
-        self._api.call("answerShippingQuery", {
+        return self._api.call("answerShippingQuery", {
             "shipping_query_id": self.id,
             "ok": True,
             "shipping_options": shipping_options._to_json()
@@ -551,7 +551,7 @@ class ShippingQueryMixin:
 
     @_require_api
     def decline(self, error_message):
-        self._api.call("answerShippingQuery", {
+        return self._api.call("answerShippingQuery", {
             "shipping_query_id": self.id,
             "ok": False,
             "error_message": error_message,
@@ -564,7 +564,7 @@ class PreCheckoutQueryMixin:
     @_require_api
     def accept(self):
         """Accept a pre checkout query"""
-        self._api.call("answerPreCheckoutQuery", {
+        return self._api.call("answerPreCheckoutQuery", {
             "pre_checkout_query_id": self.id,
             "ok": True
         })
@@ -572,7 +572,7 @@ class PreCheckoutQueryMixin:
     @_require_api
     def decline(self, error_message):
         """Decline a pre checkout query"""
-        self._api.call("answerPreCheckoutQuery", {
+        return self._api.call("answerPreCheckoutQuery", {
             "pre_checkout_query_id": self.id,
             "ok": False,
             "error_message": error_message

@@ -34,6 +34,8 @@ SEND_TO_CHAT_METHODS = (
     "sendSticker",
     "sendVideo",
     "sendVoice",
+    "sendMediaGroup",
+    "sendInvoice",
     "sendLocation",
     "sendChatAction",
     "getChat",
@@ -93,6 +95,8 @@ class TelegramAPI:
 
         self._session_cache = None
         self._session_pid = -1
+
+        self._payment_provider = None
 
     def _session(self):
         """Get the current requests session"""

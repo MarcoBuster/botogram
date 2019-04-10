@@ -26,6 +26,7 @@ from .media     import PhotoSize, Photo, Audio, Voice, Document, Sticker, \
 from .messages  import Message
 from .markup    import ReplyKeyboardMarkup, ReplyKeyboardHide, ForceReply
 from .updates   import Update, Updates
+from .payments  import Invoice
 from .mixins import Album
 
 __all__ = [
@@ -55,6 +56,9 @@ __all__ = [
     "ReplyKeyboardMarkup",
     "ReplyKeyboardHide",
     "ForceReply",
+
+    # Payments-related objects
+    "Invoice",
 
     # Updates-related objects
     "Update",

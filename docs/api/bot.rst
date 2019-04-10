@@ -94,6 +94,12 @@ components.
 
       .. versionadded:: 0.5
 
+   .. py:attribute:: payment_provider
+
+      Payments provider token, obtained via BotFather.
+
+      .. versionadded:: 0.7
+
    .. py:decoratormethod:: before_processing
 
       Functions decorated with this decorator will be called before an update

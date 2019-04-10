@@ -58,6 +58,8 @@ class Bot(frozenbot.FrozenBot):
 
         self.validate_callback_signatures = True
 
+        self._payment_provider = ""
+
         self._lang = ""
         self._lang_inst = None
         self.override_i18n = {}
@@ -336,6 +338,14 @@ class Bot(frozenbot.FrozenBot):
                       "hidden=True) instead", back=1)
     def hide_commands(self, value):
         self._hide_commands = value
+
+    @property
+    def payment_provider(self):
+        return self.api._payment_provider
+
+    @payment_provider.setter
+    def payment_provider(self, value):
+        self.api._payment_provider = value
 
 
 def create(api_key, *args, **kwargs):

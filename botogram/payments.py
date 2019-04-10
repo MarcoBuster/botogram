@@ -21,6 +21,7 @@
 import json
 
 from . import utils
+from .objects import mixins
 
 
 def process_shipping_query(bot, chains, update):
@@ -167,28 +168,30 @@ class SendInvoice(Invoice):
             self.send()
 
     def send(self):
+        payment_provider = self._api._payment_provider
+        if not payment_provider:
+            raise ValueError("You must specify a payment provider. Please read the documentation.")
+
         args = self._get_call_args(self.reply_to, self.extra, self.attach, self.notify)
-        self._api.call("sendInvoice", {
-            **args,
-            "provider_token": self.provider_token,
-            "title": self.title,
-            "description": self.description,
-            "payload": self.payload,
-            "currency": self.currency,
-            "total_price": self.total_amount,
-            "start_parameter": self.start_parameter,
-            "prices": json.dumps(self._items),
-            "photo_url": self.photo_url,
-            "photo_size": self.photo_size,
-            "photo_width": self.photo_width,
-            "photo_height": self.photo_height,
-            "need_name": self.need_name,
-            "need_phone_number": self.need_phone_number,
-            "need_email": self.need_email,
-            "need_shipping_address": self.need_shipping_address,
-            "is_flexible": self.is_flexible,
-            "disable_notification": not args.get("notify", True),
-        })
+        args["provider_token"] = payment_provider
+        args["title"] = self.title
+        args["description"] = self.description
+        args["payload"] = self.payload
+        args["currency"] = self.currency
+        args["total_price"] = self.total_amount
+        args["start_parameter"] = self.start_parameter
+        args["prices"] = json.dumps(self._items)
+        args["photo_url"] = self.photo_url
+        args["photo_size"] = self.photo_size
+        args["photo_width"] = self.photo_width
+        args["photo_height"] = self.photo_height
+        args["need_name"] = self.need_name
+        args["need_phone_number"] = self.need_phone_number
+        args["need_email"] = self.need_email
+        args["need_shipping_address"] = self.need_shipping_address
+        args["is_flexible"] = self.is_flexible
+        return self._api.call("sendInvoice", args,
+                              expect=mixins._objects().Message)
 
     def __del__(self):
         if not self._used:

@@ -28,6 +28,7 @@ import logbook
 
 from . import jobs
 from . import shared
+from . import inline
 from . import ipc
 from .. import api
 from .. import updates as updates_module
@@ -126,6 +127,12 @@ class IPCProcess(BaseProcess):
                              self.shared_commands.lock_import)
         ipc.register_command("shared.lock_export",
                              self.shared_commands.lock_export)
+
+        # Setup the inline commands
+        self.inline_commands = inline.InlineCommands()
+        ipc.register_command("inline.get", self.inline_commands.get)
+        ipc.register_command("inline.update", self.inline_commands.update)
+        ipc.register_command("inline.purge", self.inline_commands.purge)
 
     def before_start(self):
         # Start the shared memory manager

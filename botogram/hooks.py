@@ -290,7 +290,7 @@ class InlineHook(Hook):
 
         results = []
         sliced = itertools.islice(generator, offset, None)
-        for i in range(offset, offset+self.paginate):
+        for i in range(offset, offset + self.paginate):
             try:
                 element = next(sliced)
             except StopIteration:
@@ -304,7 +304,7 @@ class InlineHook(Hook):
             "cache_time": self.cache,
             "is_personal": self.private,
             "results": json.dumps(results),
-            "next_offset": offset+self.paginate,
+            "next_offset": offset + self.paginate,
         }
         return bot.api.call("answerInlineQuery", args)
 

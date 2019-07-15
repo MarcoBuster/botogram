@@ -33,5 +33,6 @@ class InlineCommands:
         reply(True)
 
     def purge(self, sender, reply):
-        del self.paginate[sender]
+        if sender in self.paginate:
+            del self.paginate[sender]
         reply(True)

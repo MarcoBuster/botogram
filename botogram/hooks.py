@@ -279,6 +279,9 @@ class InlineHook(Hook):
         inline = update.inline_query
         sender = update.inline_query.sender
 
+        if inline.offset == '':
+            self._ipc_purge(sender)
+
         # TODO: Get the generator from the IPC, because now is not efficent
         generator = bot._call(self.func,
                               self.component_id,
@@ -294,7 +297,6 @@ class InlineHook(Hook):
             try:
                 element = next(sliced)
             except StopIteration:
-                self._ipc_purge(sender)
                 break
             element['id'] = i
             results.append(element)

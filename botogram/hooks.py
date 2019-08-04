@@ -274,40 +274,12 @@ class InlineHook(Hook):
         self._ipc = None
 
     def _call(self, bot, update):
-        if self._ipc is None:
-            self._ipc = multiprocessing.current_process().ipc
         inline = update.inline_query
         sender = update.inline_query.sender
 
-        if inline.offset == '':
-            self._ipc_purge(sender)
+        # Nope.
 
-        # TODO: Get the generator from the IPC, because now is not efficent
-        generator = bot._call(self.func,
-                              self.component_id,
-                              inline=inline,
-                              sender=inline.sender,
-                              query=inline.query)
-        offset = self._ipc_get(sender)
-        self._ipc_update(sender, offset + self.paginate)
-
-        results = []
-        sliced = itertools.islice(generator, offset, None)
-        for i in range(offset, offset + self.paginate):
-            try:
-                element = next(sliced)
-            except StopIteration:
-                break
-            element['id'] = i
-            results.append(element)
-
-        args = {
-            "inline_query_id": inline.id,
-            "cache_time": self.cache,
-            "is_personal": self.private,
-            "results": json.dumps(results),
-            "next_offset": offset + self.paginate,
-        }
+        args = {}
         return bot.api.call("answerInlineQuery", args)
 
 

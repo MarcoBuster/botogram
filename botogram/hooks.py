@@ -17,9 +17,6 @@
 #   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 #   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
-import itertools
-import json
-import multiprocessing
 import re
 
 from .callbacks import hashed_callback_name
@@ -257,21 +254,11 @@ class CallbackHook(Hook):
 class InlineHook(Hook):
     """Underlying hook for @bot.inline"""
 
-    def _ipc_get(self, sender):
-        return self._ipc.command('inline.get', sender.id)
-
-    def _ipc_update(self, sender, value):
-        self._ipc.command('inline.update', (sender.id, value))
-
-    def _ipc_purge(self, sender):
-        self._ipc.command('inline.purge', sender.id)
-
     def _after_init(self, args):
         self.cache = args["cache"]
         self.private = args["private"]
         self.paginate = args["paginate"]
         self.timer = args["timer"]
-        self._ipc = None
 
     def _call(self, bot, update):
         inline = update.inline_query

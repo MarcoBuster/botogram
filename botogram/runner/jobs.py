@@ -53,12 +53,13 @@ class JobsCommands:
             self._put(job)
         reply(None)
 
-    def get(self, _, reply):
+    def get(self, worker_id, reply):
         """Get a job from the queue"""
         # If there is something in the queue return it, else append the request
         # to the new jobs' waiting deque
         if len(self.queue) > 0:
-            reply(self.queue.pop())
+            job = self.queue.pop()
+            return job
         else:
             if self.stop:
                 reply("__stop__")

@@ -58,8 +58,7 @@ class JobsCommands:
         # If there is something in the queue return it, else append the request
         # to the new jobs' waiting deque
         if len(self.queue) > 0:
-            job = self.queue.pop()
-            return job
+            reply(self.queue.pop())
         else:
             if self.stop:
                 reply("__stop__")

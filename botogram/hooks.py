@@ -18,6 +18,8 @@
 #   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
 import re
+import json
+from time import time
 
 from .callbacks import hashed_callback_name
 from .context import Context
@@ -261,13 +263,57 @@ class InlineHook(Hook):
         self.timer = args["timer"]
 
     def _call(self, bot, update):
-        inline = update.inline_query
         sender = update.inline_query.sender
+        inline = update.inline_query
+        query = inline.query
+        counter = 0
+        inline_query = []
+        if sender.id not in bot._inline_paginate \
+                or query != bot._inline_paginate[sender.id][0]. \
+                gi_frame.f_locals["query"] \
+                or time() > bot._inline_paginate[sender.id][1]:
+            inline.cache = self.cache
+            inline.private = self.private
+            inline.paginate = self.paginate
+            bot._inline_paginate[sender.id] = [bot._call(self.func,
+                                                         self.component_id,
+                                                         inline=inline,
+                                                         sender=sender,
+                                                         query=query),
+                                               time() + self.timer]
 
-        # Nope.
+        inline_old = bot._inline_paginate[sender.id][0]. \
+            gi_frame.f_locals["inline"]
 
-        args = {}
-        return bot.api.call("answerInlineQuery", args)
+        while True:
+            try:
+                queryresult = next(bot._inline_paginate[sender.id][0])
+                queryresult["id"] = str(counter)
+                inline_query.append(queryresult)
+            except StopIteration:
+                break
+            counter += 1
+            if (counter % inline_old.paginate) == 0:
+                args = {
+                    "inline_query_id": inline.id,
+                    "cache_time": inline_old.cache,
+                    "is_personal": inline_old.private,
+                    "results": json.dumps(inline_query),
+                    "next_offset": str(counter)
+                }
+                bot.api.call("answerInlineQuery", args)
+                return True
+
+        if len(inline_query) > 0:
+            args = {
+                "inline_query_id": inline.id,
+                "cache_time": inline_old.cache,
+                "is_personal": inline_old.private,
+                "results": json.dumps(inline_query),
+            }
+            bot.api.call("answerInlineQuery", args)
+        del bot._inline_paginate[sender.id]
+        return True
 
 
 class ChatUnavailableHook(Hook):
